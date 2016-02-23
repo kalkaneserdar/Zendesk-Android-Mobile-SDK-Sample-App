@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Sample Application</string>
+    <string name="action_settings">Settings</string>
+    <string name="HelpCenterButtonText">Help Center</string>
+    <string name="ContactUsButtonText">Contact Us</string>
+    <string name="RateMyAppButtonText">Rate My App</string>
+</resources>
