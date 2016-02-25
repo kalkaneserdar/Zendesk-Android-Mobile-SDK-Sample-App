@@ -35,15 +35,21 @@ public class MainActivity extends AppCompatActivity {
         //Enable Logging for Message Base mobile SDK
         Logger.setLoggable(true);
 
-        //Reference of Contact Resources
+        /*Reference of Customer Support UI Resources.
+        Each customer support event will be triggered through separate buttons.
+         */
         Button HelpCenterButton = (Button)(findViewById(R.id.HelpCenterButton));
         Button ContactUsButton = (Button)(findViewById(R.id.ContactUsButton));
         Button RateMyAppButton = (Button)(findViewById(R.id.RateMyAppButton));
 
-        //Initializing mobile SDK for Message Base Sample Application
+        /*Initializing Zendesk Mobile SDK 1.1.5 for Message Base Sample Application.
+        SDK initialization configuration is directly copied from Help Desk Mobil SDK settings screen.
+         */
         ZendeskConfig.INSTANCE.init(this, "https://messagebase.zendesk.com", "41001d9be97186cdc323bb10c750e53a237c2a01c4e59355", "mobile_sdk_client_8c58512b6fd95599a694");
 
-        //Setting User Identity
+        /* Anonymous user authentication will be used. One sample user identity will be set for trial Sample Application.
+        User identity will consist of following fields: Email and Name&Surname.
+         */
         Identity user;
         user = new AnonymousIdentity.Builder()
                 .withEmailIdentifier("kalkaneserdar@gmail.com")
@@ -51,32 +57,43 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         ZendeskConfig.INSTANCE.setIdentity(user);
 
-        //Displaying Help Center (aka Knowledge Base)
+        /*Starting a Support Activity which is necessary for ticketing(Contact Us) & self service support(Help Center).
+        First the configuration will be set as follows:
+        */
+        ZendeskConfig.INSTANCE.setContactConfiguration(new BaseZendeskFeedbackConfiguration() {
+            @Override
+            public String getRequestSubject() {
+                return "Support Request";
+            }
+        });
+
+        /*In order to use self service support (Help Center) functionality, Help Center feature should be enabled on Zendesk Help Desk.
+        After enabling Help Center, few sample articles should be published in Help Center.
+        Finally, set and display Help Center (aka Knowledge Base)
+         */
         HelpCenterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SupportActivity.Builder builder = new SupportActivity.Builder();
-                builder.listCategories().show(MainActivity.this);
+                builder.show(MainActivity.this);
             }
         });
 
-        //Setting Contact Configuration and Contact Us screen
-        ZendeskConfig.INSTANCE.setContactConfiguration(new BaseZendeskFeedbackConfiguration() {
-            @Override
-            public String getRequestSubject() {
-                return "Customer Feedback!";
-            }
-        });
-
+        /*Following earlier SupportActivity initialization, a ticketing dialogue should be enabled.
+        Initializing and Displaying Contact Us:
+         */
         ContactUsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent contactUsIntent = new Intent(MainActivity.this, ContactZendeskActivity.class);
-                startActivity(contactUsIntent);
+            public void onClick (View view){
+            Intent contactUsIntent = new Intent(MainActivity.this, ContactZendeskActivity.class);
+            startActivity(contactUsIntent);
             }
         });
 
-        //Displaying Rate My App
+        /*In order to use RateMyApp feedback functionality, RateMyApp settings should be made on Zendesk Help Desk.
+        RateMyApp will prompt mobile app users to disclose satisfaction through Store or privately on Zendesk Help Desk.
+        Initializing RateMyApp configuration
+         */
         final BaseZendeskFeedbackConfiguration RateMyAppConfiguration = new BaseZendeskFeedbackConfiguration() {
             @Override
             public String getRequestSubject() {
@@ -84,20 +101,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        //Displaying RateMyApp Dialogue
         RateMyAppButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                RateMyAppDialog rateMyAppDialog = new RateMyAppDialog.Builder(MainActivity.this)
-                        .withAndroidStoreRatingButton()
-                        .withSendFeedbackButton(RateMyAppConfiguration)
-                        .withDontRemindMeAgainButton()
-                        .build();
+            @Override
+            public void onClick (View view){
+            RateMyAppDialog rateMyAppDialog = new RateMyAppDialog.Builder(MainActivity.this)
+                    .withAndroidStoreRatingButton()
+                    .withSendFeedbackButton(RateMyAppConfiguration)
+                    .withDontRemindMeAgainButton()
+                    .build();
 
-                rateMyAppDialog.show(MainActivity.this);
-                }
-            });
+            rateMyAppDialog.show(MainActivity.this);
+            }
+        });
     }
 
-    @Override
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
